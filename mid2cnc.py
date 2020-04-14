@@ -79,6 +79,14 @@ machines_dict = dict( {
             'XYZ'
         ],
 
+        'I3':[
+            'metric',
+            80.0, 80.0, 400.0,
+            0.000, 0.000, 0.000,
+            100.000, 100.000, 100.000,
+            'XYZ'
+        ],		
+
         'custom':[
             'metric',
             10.0, 10.0, 10.0,
@@ -142,11 +150,11 @@ def reached_limit(current, distance, direction, min, max):
         # Movement in *either* direction violates the safe working
         # envelope, so abort.
         # 
-        print "\n*** ERROR ***"
-        print "The current movement cannot be completed within the safe working envelope of"
-        print "your machine. Turn on the --verbose option to see which MIDI data caused the"
-        print "problem and adjust the MIDI file (or your safety limits if you are confident"
-        print "you can do that safely). Aborting."
+        print ("\n*** ERROR ***")
+        print ("The current movement cannot be completed within the safe working envelope of")
+        print ("your machine. Turn on the --verbose option to see which MIDI data caused the")
+        print ("problem and adjust the MIDI file (or your safety limits if you are confident")
+        print ("you can do that safely). Aborting.")
         exit(2);
     
 ######################################
@@ -298,36 +306,38 @@ if os.path.getsize(args.infile.name) == 0:
     msg="Input file %s is empty! Aborting." % os.path.basename(args.infile.name)
     raise argparse.ArgumentTypeError(msg)
 
-print "MIDI input file:\n    %s" % args.infile.name
-print "Gcode output file:\n     %s" % args.outfile.name
+print ("MIDI input file:\n    %s" % args.infile.name)
+print ("Gcode output file:\n     %s" % args.outfile.name)
 
 # Default is Cupcake, so check the others first
 
 if args.machine == 'shapercube':
-    print "Machine type:\n    Shapercube"
+    print ("Machine type:\n    Shapercube")
 elif args.machine == 'ultimaker':
-    print "Machine type:\n    Ultimaker"
+    print ("Machine type:\n    Ultimaker")
 elif args.machine == 'thingomatic':
-    print "Machine type:\n    Makerbot Thing-O-Matic"
-elif args.machine == 'custom':
-    print "Machine type:\n    Bespoke machine"
+    print ("Machine type:\n    Makerbot Thing-O-Matic")
 elif args.machine == 'cupcake':
-    print "Machine type:\n    Makerbot Cupcake CNC"
+    print ("Machine type:\n    Makerbot Cupcake CNC")
+elif args.machine == 'I3':
+    print ("Machine type:\n    I3 machine")
+elif args.machine == 'custom':
+    print ("Machine type:\n    Bespoke machine")	
 
 if args.axes != 'XYZ':
    active_axes = len(args.axes)
 
 # Default is metric, so check the non-default case first
-print "Units and Feed rates:\n    %s and %s/minute" % ( scheme[0], scheme[1] )
-print "Minimum safe limits [X, Y, Z]:\n    [%.3f, %.3f, %.3f]" % (args.safemin[0], args.safemin[1], args.safemin[2])
-print "Maximum safe limits [X, Y, Z]:\n    [%.3f, %.3f, %.3f]" % (args.safemax[0], args.safemax[1], args.safemax[2])
+print ("Units and Feed rates:\n    %s and %s/minute" % ( scheme[0], scheme[1] ))
+print ("Minimum safe limits [X, Y, Z]:\n    [%.3f, %.3f, %.3f]" % (args.safemin[0], args.safemin[1], args.safemin[2]))
+print ("Maximum safe limits [X, Y, Z]:\n    [%.3f, %.3f, %.3f]" % (args.safemax[0], args.safemax[1], args.safemax[2]))
 
-print "Pulses per %s [X, Y, Z] axis:\n    [%.3f, %.3f, %.3f]" % (scheme[0], args.ppu[0], args.ppu[1], args.ppu[2])
+print ("Pulses per %s [X, Y, Z] axis:\n    [%.3f, %.3f, %.3f]" % (scheme[0], args.ppu[0], args.ppu[1], args.ppu[2]))
 
 if active_axes > 1:
-    print "Generate Gcode for:\n    %d axes in the order %s" % (active_axes, args.axes)
+    print ("Generate Gcode for:\n    %d axes in the order %s" % (active_axes, args.axes))
 else:
-    print "Generate Gcode for:\n    %s axis only" % args.axes
+    print ("Generate Gcode for:\n    %s axis only" % args.axes)
 
 # Set up an array to allow processing inside the loop to take account of the
 # difference in feed rates required on each axis
@@ -348,10 +358,10 @@ def main(argv):
 
     midi = midiparser.File(args.infile.name)
     
-    print "\nMIDI file:\n    %s" % os.path.basename(args.infile.name)
-    print "MIDI format:\n    %d" % midi.format
-    print "Number of tracks:\n    %d" % midi.num_tracks
-    print "Timing division:\n    %d" % midi.division
+    print ("\nMIDI file:\n    %s" % os.path.basename(args.infile.name))
+    print ("MIDI format:\n    %d" % midi.format)
+    print ("Number of tracks:\n    %d" % midi.num_tracks)
+    print ("Timing division:\n    %d" % midi.division)
 
     noteEventList=[]
     all_channels=set()
@@ -362,7 +372,7 @@ def main(argv):
             if event.type == midiparser.meta.SetTempo:
                 tempo=event.detail.tempo
                 if args.verbose:
-                    print "Tempo change: " + str(event.detail.tempo)
+                    print ("Tempo change: " + str(event.detail.tempo))
             if ((event.type == midiparser.voice.NoteOn) and (event.channel in args.channels)): # filter undesired instruments
 
                 if event.channel not in channels:
@@ -387,26 +397,26 @@ def main(argv):
                     print("Note off (time, channel, note, velocity) : %6i %6i %6i %6i" % (event.absolute, event.channel, event.detail.note_no, event.detail.velocity) )
             if event.type == midiparser.meta.TrackName: 
                 if args.verbose:
-                    print event.detail.text.strip()
+                    print (event.detail.text.strip())
             if event.type == midiparser.meta.CuePoint: 
                 if args.verbose:
-                    print event.detail.text.strip()
+                    print (event.detail.text.strip())
             if event.type == midiparser.meta.Lyric: 
                 if args.verbose:
-                    print event.detail.text.strip()
+                    print (event.detail.text.strip())
                 #if event.type == midiparser.meta.KeySignature: 
                 # ...
 
         # Finished with this track
         if len(channels) > 0:
             msg=', ' . join(['%2d' % ch for ch in sorted(channels)])
-            print 'Processed track %d, containing channels numbered: [%s ]' % (track.number, msg)
+            print ('Processed track %d, containing channels numbered: [%s ]' % (track.number, msg))
             all_channels = all_channels.union(channels)
 
     # List all channels encountered
     if len(all_channels) > 0:
         msg=', ' . join(['%2d' % ch for ch in sorted(all_channels)])
-        print 'The file as a whole contains channels numbered: [%s ]' % msg
+        print ('The file as a whole contains channels numbered: [%s ]' % msg)
 
     # We now have entire file's notes with abs time from all channels
     # We don't care which channel/voice is which, but we do care about having all the notes in order
@@ -433,7 +443,7 @@ def main(argv):
     elif args.units == 'metric':
         args.outfile.write ("G21 (Metric FTW)\n")
     else:
-        print "\nWARNING: Gcode metric/imperial setting undefined!\n"
+        print ("\nWARNING: Gcode metric/imperial setting undefined!\n")
 
     args.outfile.write ("G90 (Absolute posiitioning)\n")
     args.outfile.write ("G92 X0 Y0 Z0 (set origin to current position)\n")
@@ -504,9 +514,9 @@ def main(argv):
                 combined_feedrate = math.sqrt(feed_xyz[0]**2 + feed_xyz[1]**2 + feed_xyz[2]**2)
                 
                 if args.verbose:
-                    print "Chord: [%7.3f, %7.3f, %7.3f] in Hz for %5.2f seconds at timestamp %i" % (freq_xyz[0], freq_xyz[1], freq_xyz[2], duration, note[0])
-                    print " Feed: [%7.3f, %7.3f, %7.3f] XYZ %s/min and %8.2f combined" % (feed_xyz[0], feed_xyz[1], feed_xyz[2], scheme[1], combined_feedrate )
-                    print "Moves: [%7.3f, %7.3f, %7.3f] XYZ relative %s" % (distance_xyz[0], distance_xyz[1], distance_xyz[2], scheme[0] )
+                    print ("Chord: [%7.3f, %7.3f, %7.3f] in Hz for %5.2f seconds at timestamp %i" % (freq_xyz[0], freq_xyz[1], freq_xyz[2], duration, note[0]))
+                    print (" Feed: [%7.3f, %7.3f, %7.3f] XYZ %s/min and %8.2f combined" % (feed_xyz[0], feed_xyz[1], feed_xyz[2], scheme[1], combined_feedrate ))
+                    print ("Moves: [%7.3f, %7.3f, %7.3f] XYZ relative %s" % (distance_xyz[0], distance_xyz[1], distance_xyz[2], scheme[0] ))
 
                 # Turn around BEFORE crossing the limits of the 
                 # safe working envelope
@@ -524,7 +534,7 @@ def main(argv):
                 z = (z + (distance_xyz[2] * z_dir))
                
                 if args.verbose:
-                    print "G01 X%.10f Y%.10f Z%.10f F%.10f\n" % (x, y, z, combined_feedrate)
+                    print ("G01 X%.10f Y%.10f Z%.10f F%.10f\n" % (x, y, z, combined_feedrate))
                 args.outfile.write("G01 X%.10f Y%.10f Z%.10f F%.10f\n" % (x, y, z, combined_feedrate))
 
             else:
@@ -532,8 +542,8 @@ def main(argv):
                 # How standard is this pause gcode, anyway?
                 args.outfile.write("G04 P%0.4f\n" % duration )
                 if args.verbose:
-                    print "Pause for %.2f seconds" % duration
-                    print "G04 P%0.4f\n" % duration
+                    print ("Pause for %.2f seconds" % duration)
+                    print ("G04 P%0.4f\n" % duration)
 
             # finally, set this absolute time as the new starting time
             last_time = note[0]
@@ -541,7 +551,7 @@ def main(argv):
         if note[1]==1: # Note on
             if active_notes.has_key(note[2]):
                 if args.verbose:
-                    print "Warning: tried to turn on note already on!"
+                    print ("Warning: tried to turn on note already on!")
             else:
                 # key and value are the same, but we don't really care.
                 active_notes[note[2]]=note[2]
@@ -550,7 +560,7 @@ def main(argv):
                 active_notes.pop(note[2])
             else:
                 if args.verbose:
-                    print "Warning: tried to turn off note that wasn't on!"
+                    print ("Warning: tried to turn off note that wasn't on!")
 
     # Handle the postfix Gcode, if present
     if args.postfix != None:
