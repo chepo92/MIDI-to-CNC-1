@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 ##################################
 #
@@ -182,7 +182,7 @@ input.add_argument(
     default = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
     nargs   = '+',
     type    = int,
-    choices = xrange(0,16),
+    choices = range(0,16),
     metavar = 'N',
     help    = 'list of MIDI channels you want to scan for event data'
 )
@@ -355,7 +355,7 @@ def main(argv):
     x_dir=1.0;
     y_dir=1.0;
     z_dir=1.0;
-
+    print ("\nMIDI file:\n    %s" % os.path.basename(args.infile.name))
     midi = midiparser.File(args.infile.name)
     
     print ("\nMIDI file:\n    %s" % os.path.basename(args.infile.name))
