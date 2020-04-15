@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+
 #Syntax to pass to the mid2cnc script: params = '-outfile ./mytest.gcode'
 # Prints are here just to show the user what's happeneing. They might as be removed.
 

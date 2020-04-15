@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 # Placed into Public Domain in June 2006 by Sean D. Spencer
 
 # Sean D. Spencer
@@ -105,16 +105,10 @@ class MetaValues:
 def getNumber(theString, length):
     # MIDI uses big-endian for everything
     sum = 0
-    print (type(theString))	
-    print ("Length: " + str(length) + "  strlen: " + str(len(theString)))
+    #print "Length: " + str(length) + "  strlen: " + str(len(theString))
     for i in range(length):
         #sum = (sum *256) + int(str[i])
-        print (type(theString[i]))
-        print (theString[i])
-        chain = str(theString[i])
-        print (chain)
-        print (type(chain))
-        sum = ((sum << 8) + ord(chain))
+        sum = (sum << 8) + ord(theString[i])
     return sum, theString[length:]
 
 
@@ -149,22 +143,14 @@ class File:
         self.file = open(self.file, 'rb')
         str = self.file.read()
         self.file.close()
-        print ("init")
+
         self.read(str)
 
     def read(self, str):
-        #print (str)
-        print (type(str))
-        print (len(str))
-        print ("Mickey")
-        print (str[0:4])		
-        assert str[:4].decode() == 'MThd'
+        assert str[:4] == "MThd"
         str = str[4:]
-        print (type(str))
-        
+
         length, str = getNumber(str, 4)
-        print (type(length))
-        print (length)
         assert length == 6
 
         self.format, str = getNumber(str, 2)
